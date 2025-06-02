@@ -1,0 +1,10 @@
+kind: "AtlasModuleParamsInsecure"
+apiVersion: "v1"
+params:
+  param_1: 9
+  param_2: 10
+  operation: divide
+  result_name: result_divide
+systems:
+  test_system:
+    url: https://test.qubership.org

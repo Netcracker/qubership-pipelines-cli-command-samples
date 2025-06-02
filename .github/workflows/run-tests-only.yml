@@ -1,0 +1,28 @@
+name: Run tests on built CLI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Build & Test
+      env:
+        GITLAB_QUBER_TOKEN: ${{ secrets.GITLAB_QUBER_TOKEN }}
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --user pipx
+        pipx install poetry
+        source ./.github/scripts/build_pyz.sh
+        ./.github/scripts/run_tests.sh

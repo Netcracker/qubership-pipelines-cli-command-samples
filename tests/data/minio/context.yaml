@@ -1,0 +1,7 @@
+kind: "AtlasModuleContextDescriptor"
+apiVersion: "v1"
+paths:
+  input:
+    params: "./minio/params.yaml"
+  output:
+    params: "./minio/result.yaml"

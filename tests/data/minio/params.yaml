@@ -1,0 +1,10 @@
+kind: "AtlasModuleParamsInsecure"
+apiVersion: "v1"
+params:
+  bucket_name: test-bucket
+  path: ""
+systems:
+  minio:
+    endpoint: http://192.168.1.6:9000
+    access_key: admin
+    secret_key: admin123

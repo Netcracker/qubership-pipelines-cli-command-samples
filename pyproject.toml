@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "qubership-pipelines-cli-command-samples"
+version = "0.0.1"
+description = "Sample implementation of CLI commands using Qubership Pipelines Common library"
+authors = ["Qubership"]
+readme = "README.md"
+license = "Apache-2.0"
+packages = [{from = "src", include = "qubership_cli_samples"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+qubership-pipelines-common-library = "*"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^6.0.0"
+
+[tool.poetry.scripts]
+cli_command_samples = "qubership_cli_samples.__main__:cli"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
