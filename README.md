@@ -16,7 +16,7 @@ Use development guide above to:
 
 The intended way to distribute CLI as an artifact is zipping it using [ZIPAPP](https://docs.python.org/3/library/zipapp.html)
 
-Example of build process is provided in [build_pyz.sh](./github/scripts/build_pyz.sh)
+Example of build process is provided in [build_pyz.sh](./.github/scripts/build_pyz.sh)
 
 Please note, that you need to unzip resulting '.pyz' artifact before using - this requirement is caused by [zipimport](https://docs.python.org/3/library/zipimport.html), which is used during `zipapp`.
 
@@ -30,6 +30,18 @@ unzip -q ./qubership_cli_samples.pyz -d ./qubership_cli_samples
 python qubership_cli_samples calc --context_path=context2.yaml
 ...
 ```
+
+
+### Samples Docker Image
+
+This repository also provides package with docker image of built executable zipapp with command samples.
+
+It is available via `ghcr.io/netcracker/qubership-pipelines-cli-command-samples:latest` (or any tagged release version)
+
+While '.pyz' artifact is built on GitHub-provided `ubuntu-latest` image and is ready-to-use in your GitHub workflows with the same runner, since we can't directly reuse it as a base image for our docker build, we use a different one.
+
+Currently, base image is `bitnami/python:3.11.11-debian-12-r0`, since it allows us to run our '.pyz' artifact with all its dynamic libraries requirements, without having to perform additional adaptation. 
+
 
 ### Minification concerns:
 
