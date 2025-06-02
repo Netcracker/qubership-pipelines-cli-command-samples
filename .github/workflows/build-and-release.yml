@@ -76,7 +76,7 @@ jobs:
       run: |
         git config --global user.email "tech@qubership.org"
         git config --global user.name "tech"
-        git add .
+        git add pyproject.toml
         git commit -m "Update version to ${{ steps.save-release-version.outputs.release_version }}"
         git push -u origin ${{ github.ref }}
 
@@ -128,7 +128,7 @@ jobs:
       uses: Netcracker/qubership-workflow-hub/actions/docker-action@main
       with:
         ref: ${{ github.ref_name }}
-        custom-image-name: quber-cli
+        custom-image-name: qubership-pipelines-cli-command-samples
         platforms: linux/amd64
         tags: latest, v${{ needs.build-and-test.outputs.release_version }}
       env:
