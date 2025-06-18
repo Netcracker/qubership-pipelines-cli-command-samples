@@ -69,7 +69,7 @@ class GithubRunPipeline(ExecutionCommand):
         else:
             branch = self.pipeline_branch
             if not branch:
-                branch = self.github_client.gh.get_repo(f"{self.pipeline_owner}/{self.pipeline_repo_name}").default_branch
+                branch = self.github_client.get_repo_default_branch(self.pipeline_owner, self.pipeline_repo_name)
             execution = self.github_client.trigger_workflow(owner=self.pipeline_owner, repo_name=self.pipeline_repo_name,
                                                             workflow_file_name=self.pipeline_workflow_file_name,
                                                             branch=branch, pipeline_params=self.pipeline_params
