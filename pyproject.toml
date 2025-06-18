@@ -8,7 +8,7 @@ license = "Apache-2.0"
 packages = [{from = "src", include = "qubership_cli_samples"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 qubership-pipelines-common-library = "*"
 
 [tool.poetry.group.test.dependencies]
