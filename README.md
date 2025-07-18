@@ -32,6 +32,25 @@ python qubership_cli_samples calc --context_path=context2.yaml
 ```
 
 
+### Passing params into CLI
+
+[`Common library`](https://github.com/Netcracker/qubership-pipelines-common-python-library) provides special decorator `@utils_cli` that allows you to:
+- configure logging of executed commands (by passing `--log-level=INFO`, for example, and available values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`)
+- pass the `context.yaml` filepath (using `--context_path=./data/context2.yaml`) 
+- or, instead, manually pass your parameters from CLI (using multiple `-p` flags with `key=value` syntax, e.g. `-p params.operation=multiply`)
+
+To use this decorator, you need to add it together with `@cli.command("cli_command_name")`, and add `**kwargs` as input parameters to your function, and pass them into `ExecutionCommand` constructor ([as shown in these examples](./src/qubership_cli_samples/__main__.py#L22))
+
+Full example of passing multiple params looks like this:
+```
+python qubership_cli_samples calc --log-level=DEBUG -p params.param_1=9 -p params.param_2=10 -p params.operation=multiply -p params.result_name=result_divide
+```
+
+You can also pass multi-level nested params using `-p` flag, dots and double-underscores are supported as separators:
+
+`-p params.credentials.system_name.login=user`
+
+
 ### Samples Docker Image
 
 This repository also provides package with docker image of built executable zipapp with command samples.
