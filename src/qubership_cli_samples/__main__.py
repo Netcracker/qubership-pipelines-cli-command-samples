@@ -4,7 +4,7 @@ from qubership_cli_samples.file_processing.file_commands import DownloadFileExec
 from qubership_cli_samples.github.github_command import GithubRunPipeline
 from qubership_cli_samples.minio_commands import ListMinioBucketObjectsCommand
 from qubership_cli_samples.report.report_command import BuildReport
-from qubership_cli_samples.sample_command import SampleStandaloneExecutionCommand, CalcCommand
+from qubership_cli_samples.sample_command import SampleStandaloneExecutionCommand, CalcCommand, GenerateTestOutputParamsCommand
 from qubership_pipelines_common_library.v1.execution.exec_logger import ExecutionLogger
 from qubership_cli_samples.umbrella_test.umbrella_command import UmbrellaCommand
 from qubership_pipelines_common_library.v1.utils.utils_cli import utils_cli
@@ -29,6 +29,13 @@ def __run_sample(**kwargs):
 @utils_cli
 def __calc(**kwargs):
     command = CalcCommand(**kwargs)
+    command.run()
+
+
+@cli.command("spam")
+@utils_cli
+def __spam(**kwargs):
+    command = GenerateTestOutputParamsCommand(**kwargs)
     command.run()
 
 

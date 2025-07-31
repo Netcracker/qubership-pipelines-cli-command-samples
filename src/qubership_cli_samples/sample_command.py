@@ -45,3 +45,36 @@ class CalcCommand(ExecutionCommand):
                 raise Exception(f"Invalid operation: {self.context.input_param_get('params.operation')}")
         self.context.output_param_set(f"params.{self.context.input_param_get('params.result_name')}", result)
         self.context.output_params_save()
+
+
+class GenerateTestOutputParamsCommand(ExecutionCommand):
+
+    WORD_LIST = [
+        "apple", "happy", "sunshine", "book", "mountain",
+        "ocean", "guitar", "laughter", "butterfly", "coffee",
+        "rainbow", "adventure", "breeze", "chocolate", "dolphin",
+        "elephant", "firefly", "garden", "harmony", "island",
+        "jellybean", "kitten", "lighthouse", "moonlight", "notebook",
+        "orange", "penguin", "quilt", "river", "sunflower",
+        "telescope", "umbrella", "violin", "waterfall", "xylophone",
+        "yogurt", "zeppelin", "autumn", "blossom", "cinnamon",
+        "daisy", "echo", "flamingo", "giraffe", "horizon",
+        "iceberg", "jazz", "kiwi", "lullaby", "meadow"
+    ]
+
+    def _validate(self):
+        names = ["paths.input.params",
+                 "paths.output.params"]
+        return self.context.validate(names)
+
+    def _execute(self):
+        import random
+        self.context.logger.info("Running GenerateTestOutputParamsCommand - spamming different params into output...")
+        for i in range(5):
+            self.context.output_param_set(f"params.some_insecure_param_{i}",
+                                          f"{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}")
+            self.context.output_param_secure_set(f"params.secure_param_{i}",
+                                          f"{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}")
+        self.context.output_param_set(f"params.nested_system.its_key", f"{random.choice(self.WORD_LIST)}")
+        self.context.output_param_set(f"params.nested_system.its_secret", f"{random.choice(self.WORD_LIST)}")
+        self.context.output_params_save()
