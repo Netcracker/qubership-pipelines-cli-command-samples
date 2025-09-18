@@ -74,8 +74,8 @@ jobs:
     - name: Commit changes
       if: ${{ inputs.patch_version }}
       run: |
-        git config --global user.email "tech@qubership.org"
-        git config --global user.name "tech"
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "github-actions[bot]"
         git add pyproject.toml
         git commit -m "Update version to ${{ steps.save-release-version.outputs.release_version }}"
         git push -u origin ${{ github.ref }}
