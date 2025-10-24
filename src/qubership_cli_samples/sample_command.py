@@ -1,5 +1,18 @@
 from qubership_pipelines_common_library.v1.execution.exec_command import ExecutionCommand
 
+WORD_LIST = [
+    "apple", "happy", "sunshine", "book", "mountain",
+    "ocean", "guitar", "laughter", "butterfly", "coffee",
+    "rainbow", "adventure", "breeze", "chocolate", "dolphin",
+    "elephant", "firefly", "garden", "harmony", "island",
+    "jellybean", "kitten", "lighthouse", "moonlight", "notebook",
+    "orange", "penguin", "quilt", "river", "sunflower",
+    "telescope", "umbrella", "violin", "waterfall", "xylophone",
+    "yogurt", "zeppelin", "autumn", "blossom", "cinnamon",
+    "daisy", "echo", "flamingo", "giraffe", "horizon",
+    "iceberg", "jazz", "kiwi", "lullaby", "meadow"
+]
+
 
 class SampleStandaloneExecutionCommand(ExecutionCommand):
 
@@ -49,19 +62,6 @@ class CalcCommand(ExecutionCommand):
 
 class GenerateTestOutputParamsCommand(ExecutionCommand):
 
-    WORD_LIST = [
-        "apple", "happy", "sunshine", "book", "mountain",
-        "ocean", "guitar", "laughter", "butterfly", "coffee",
-        "rainbow", "adventure", "breeze", "chocolate", "dolphin",
-        "elephant", "firefly", "garden", "harmony", "island",
-        "jellybean", "kitten", "lighthouse", "moonlight", "notebook",
-        "orange", "penguin", "quilt", "river", "sunflower",
-        "telescope", "umbrella", "violin", "waterfall", "xylophone",
-        "yogurt", "zeppelin", "autumn", "blossom", "cinnamon",
-        "daisy", "echo", "flamingo", "giraffe", "horizon",
-        "iceberg", "jazz", "kiwi", "lullaby", "meadow"
-    ]
-
     def _validate(self):
         names = ["paths.input.params",
                  "paths.output.params"]
@@ -72,9 +72,26 @@ class GenerateTestOutputParamsCommand(ExecutionCommand):
         self.context.logger.info("Running GenerateTestOutputParamsCommand - spamming different params into output...")
         for i in range(5):
             self.context.output_param_set(f"params.some_insecure_param_{i}",
-                                          f"{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}")
+                                          f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
             self.context.output_param_secure_set(f"params.secure_param_{i}",
-                                          f"{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}_{random.choice(self.WORD_LIST)}")
-        self.context.output_param_set(f"params.nested_system.its_key", f"{random.choice(self.WORD_LIST)}")
-        self.context.output_param_set(f"params.nested_system.its_secret", f"{random.choice(self.WORD_LIST)}")
+                                          f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
+        self.context.output_param_set(f"params.nested_system.its_key", f"{random.choice(WORD_LIST)}")
+        self.context.output_param_set(f"params.nested_system.its_secret", f"{random.choice(WORD_LIST)}")
         self.context.output_params_save()
+
+
+class GenerateTestOutputFilesCommand(ExecutionCommand):
+
+    def _validate(self):
+        names = ["paths.input.params", "paths.output.files"]
+        return self.context.validate(names)
+
+    def _execute(self):
+        import random
+        from pathlib import Path
+        files_count = int(self.context.input_param_get("params.files_count", 1))
+        self.context.logger.info(f"Running GenerateTestOutputFilesCommand - creating {files_count} different file(s) in output_files directory...")
+        for i in range(files_count):
+            target_path = Path(self.context.input_param_get("paths.output.files")).joinpath(f"file_{i}.txt")
+            with open(target_path, 'w') as fs:
+                fs.write(f"File words spam: {random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}\nAnd even {random.choice(WORD_LIST)}!")
