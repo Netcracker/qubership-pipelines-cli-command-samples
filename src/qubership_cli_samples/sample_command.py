@@ -69,15 +69,17 @@ class GenerateTestOutputParamsCommand(ExecutionCommand):
 
     def _execute(self):
         import random
-        self.context.logger.info("Running GenerateTestOutputParamsCommand - spamming different params into output...")
+        self.context.logger.info("Running GenerateTestOutputParamsCommand - generating params into output_params and output_params_secure...")
+
         for i in range(5):
             self.context.output_param_set(f"params.some_insecure_param_{i}",
                                           f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
             self.context.output_param_secure_set(f"params.secure_param_{i}",
                                           f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
-        self.context.output_param_set(f"params.nested_system.its_key", f"{random.choice(WORD_LIST)}")
-        self.context.output_param_set(f"params.nested_system.its_secret", f"{random.choice(WORD_LIST)}")
+        self.context.output_param_set("params.nested_system.its_key", f"{random.choice(WORD_LIST)}")
+        self.context.output_param_set("params.nested_system.its_secret", f"{random.choice(WORD_LIST)}")
         self.context.output_params_save()
+        self.context.logger.info("Finished GenerateTestOutputParamsCommand")
 
 
 class GenerateTestOutputFilesCommand(ExecutionCommand):
@@ -90,8 +92,49 @@ class GenerateTestOutputFilesCommand(ExecutionCommand):
         import random
         from pathlib import Path
         files_count = int(self.context.input_param_get("params.files_count", 1))
-        self.context.logger.info(f"Running GenerateTestOutputFilesCommand - creating {files_count} different file(s) in output_files directory...")
+        self.context.logger.info(f"Running GenerateTestOutputFilesCommand - creating {files_count} different file(s) in output_files directory... (files_count={files_count})")
+
         for i in range(files_count):
             target_path = Path(self.context.input_param_get("paths.output.files")).joinpath(f"file_{i}.txt")
             with open(target_path, 'w') as fs:
                 fs.write(f"File words spam: {random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}\nAnd even {random.choice(WORD_LIST)}!")
+
+        self.context.logger.info("Finished GenerateTestOutputFilesCommand")
+
+
+class GenerateTestModuleReportCommand(ExecutionCommand):
+
+    def _validate(self):
+        names = ["paths.input.params",
+                 "paths.output.params"]
+        return self.context.validate(names)
+
+    def _execute(self):
+        import random
+        from pathlib import Path
+        params_count = int(self.context.input_param_get("params.params_count", 3))
+        report_extension = self.context.input_param_get("params.extension", "json")
+        self.context.logger.info(f"Running GenerateTestModuleReportCommand - generating params into moduleReport file... (params_count={params_count}, extension={report_extension})")
+
+        report = {
+            "kind": "AtlasModuleReport",
+            "apiVersion": "v1",
+            "reportedParams": {}
+        }
+        for i in range(params_count):
+            report["reportedParams"][f"param_{i}"] = f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}"
+
+        report_extension_lower = report_extension.lower()
+        if report_extension_lower not in ["json", "yaml"]:
+            self.context.logger.warning(f"Unknown requested extension: {report_extension}! Falling back to \"json\"")
+            report_extension_lower = "json"
+
+        if report_extension_lower == "json":
+            import json
+            with open(Path(self.context.path_logs).joinpath("execution_report.json"), 'w') as fs:
+                fs.write(json.dumps(report))
+        elif report_extension_lower == "yaml":
+            from qubership_pipelines_common_library.v1.utils.utils_file import UtilsFile
+            UtilsFile.write_yaml(Path(self.context.path_logs).joinpath("execution_report.yaml"), report)
+
+        self.context.logger.info("Finished GenerateTestModuleReportCommand")

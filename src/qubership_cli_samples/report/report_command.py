@@ -1,4 +1,4 @@
-import yaml
+import json
 
 from pathlib import Path
 from qubership_pipelines_common_library.v1.execution.exec_command import ExecutionCommand
@@ -12,9 +12,9 @@ class BuildReport(ExecutionCommand):
         return True
 
     def _execute(self):
-        report_data_path = Path(self.context.input_param_get("paths.input.files")).joinpath("execution_report.yaml")
+        report_data_path = Path(self.context.input_param_get("paths.input.files")).joinpath("execution_report.json")
         with open(report_data_path, 'r') as rd:
-            report_data = yaml.safe_load(rd.read())
+            report_data = json.load(rd)
 
         html_template_path = self.context.input_param_get("paths.input.params.report_template", None)
         html_template_str = self._load_template(html_template_path)
@@ -49,15 +49,14 @@ class BuildReport(ExecutionCommand):
         # Prepare stages HTML
         stages_html = ""
         for index, stage in enumerate(stages, start=1):
-            stage_exec = stage.get("execution", {})  # Access execution directly
-            result_class = "success" if stage_exec.get("result") == "SUCCESS" else "failed"
             stages_html += f"""
                 <tr>
                     <td>{index}</td>
-                    <td>{stage_exec.get("name", "N/A")}</td>
-                    <td class="{result_class}">{stage_exec.get("result", "N/A")}</td>
-                    <td>{stage_exec.get("time", "N/A")}</td>
-                    <td><a href="{stage_exec.get("url", "#")}">{stage_exec.get("url", "N/A")}</a></td>
+                    <td>{stage.get("name", "N/A")}</td>
+                    <td>{stage.get("type", "N/A")}</td>
+                    <td class="{stage.get("status", "N/A")}">{stage.get("status", "N/A")}</td>
+                    <td>{stage.get("time", "N/A")}</td>
+                    <td><a href="{stage.get("url", "#")}">{stage.get("url", "N/A")}</a></td>
                 </tr>
             """
 
@@ -66,9 +65,9 @@ class BuildReport(ExecutionCommand):
             apiVersion=report_data.get("apiVersion", "N/A"),
             user=execution.get("user", "Unknown User"),
             email=execution.get("email", "unknown@example.com"),
-            started=execution.get("started", "N/A"),
+            startedAt=execution.get("startedAt", "N/A"),
             time=execution.get("time", "N/A"),
-            result=execution.get("result", "N/A"),
+            status=execution.get("status", "N/A"),
             url=execution.get("url", "#"),
             stages=stages_html
         )

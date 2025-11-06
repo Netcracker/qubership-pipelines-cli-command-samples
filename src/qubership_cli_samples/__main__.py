@@ -56,9 +56,24 @@ def __spam_files(**kwargs):
         logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
 
 
+@cli.command("spam-module-report")
+@utils_cli
+def __spam_module_report(**kwargs):
+    logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
+    start_cmd_import = time.perf_counter()
+    from qubership_cli_samples.sample_command import GenerateTestModuleReportCommand
+    logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
+    start_cmd = time.perf_counter()
+    try:
+        command = GenerateTestModuleReportCommand(**kwargs)
+        command.run()
+    finally:
+        logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+
+
 @cli.command("list-minio-files")
 @utils_cli
-def __list(**kwargs):
+def __list_minio_files(**kwargs):
     from qubership_cli_samples.minio_commands import ListMinioBucketObjectsCommand
     command = ListMinioBucketObjectsCommand(**kwargs)
     command.run()
@@ -66,7 +81,7 @@ def __list(**kwargs):
 
 @cli.command("umbrella-test")
 @utils_cli
-def __devtest(**kwargs):
+def __umbrella_test(**kwargs):
     from qubership_cli_samples.umbrella_test.umbrella_command import UmbrellaCommand
     command = UmbrellaCommand(folder_path="./RESULTS_FOLDER", input_params={"systems": {"gitlab": {"url": "https://gitlab.com"}}})
     command.run()
@@ -82,7 +97,7 @@ def __download_file(**kwargs):
 
 @cli.command("analyze-file")
 @utils_cli
-def __download_file(**kwargs):
+def __analyze_file(**kwargs):
     from qubership_cli_samples.file_processing.file_commands import AnalyzeFileExecutionCommand
     command = AnalyzeFileExecutionCommand(**kwargs)
     command.run()
@@ -107,7 +122,7 @@ def __trigger_github_pipeline(**kwargs):
 
 @cli.command("generate-html-report")
 @utils_cli
-def __trigger_github_pipeline(**kwargs):
+def __generate_html_report(**kwargs):
     from qubership_cli_samples.report.report_command import BuildReport
     command = BuildReport(**kwargs)
     command.run()
