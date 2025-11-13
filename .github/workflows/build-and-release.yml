@@ -5,7 +5,7 @@ on:
     inputs:
       patch_version:
         description: "Patch version"
-        default: true
+        default: false
         required: true
         type: boolean
       use_custom_version:

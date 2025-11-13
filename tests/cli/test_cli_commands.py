@@ -43,7 +43,7 @@ class TestSampleCLICommands(unittest.TestCase):
             self.assertEqual(0.9,  result['params']['result_divide'])
 
     def test_calc_sample_with_input_params(self):
-        output = subprocess.run(["python", QUBER_CLI, "calc", "-p params.param_1=9", "-p params.param_2=10",
+        output = subprocess.run(["python", QUBER_CLI, "calc", "-s params.param_1=9", "-s params.param_2=10",
                                  "-p params.operation=multiply", "-p params.result_name=result_divide"],
                                 capture_output=True, text=True)
         match = re.search(r'.*paths.output.params: (.*)', output.stdout)
