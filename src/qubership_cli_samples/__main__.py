@@ -126,3 +126,11 @@ def __generate_html_report(**kwargs):
     from qubership_cli_samples.report.report_command import BuildReport
     command = BuildReport(**kwargs)
     command.run()
+
+
+@cli.command("podman-run")
+@utils_cli
+def __podman_run(**kwargs):
+    from qubership_cli_samples.podman.podman_command import PodmanRunImage
+    command = PodmanRunImage(**kwargs)
+    command.run()
