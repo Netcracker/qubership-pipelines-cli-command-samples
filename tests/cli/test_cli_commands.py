@@ -4,7 +4,13 @@ import subprocess
 import unittest
 import yaml
 import re
-from pathlib import Path
+
+
+def strip_ansi_codes(text):
+    """Remove ANSI escape codes from a string."""
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
+
 
 QUBER_CLI = "qubership_cli_samples"
 
@@ -13,6 +19,8 @@ class TestSampleCLICommands(unittest.TestCase):
 
     def setUp(self):
         logging.info(os.getcwd())
+
+
 
     def test_help(self):
         output = subprocess.run(["python", QUBER_CLI, "--help"], capture_output = True, text = True)
@@ -26,12 +34,12 @@ class TestSampleCLICommands(unittest.TestCase):
             self.assertEqual(19,  result['params']['result'])
 
     def test_run_sample_with_input_params(self):
-        output = subprocess.run(["python", QUBER_CLI, "run-sample", "-p params__param_1=11", "-p params__param_2=11"],
+        output = subprocess.run(["python", QUBER_CLI, "run-sample", "--log-level=DEBUG", "-p params__param_1=11", "-p params__param_2=11"],
                                 capture_output = True, text = True)
         match = re.search(r'.*paths.output.params: (.*)', output.stdout)
         if not match:
             raise Exception(f"Unexpected command execution result:\n{output.stdout + output.stderr}")
-        with open(match.group(1), 'r', encoding='utf-8') as file:
+        with open(strip_ansi_codes(match.group(1)).strip(), 'r', encoding='utf-8') as file:
             result = yaml.safe_load(file)
             self.assertEqual(22,  result['params']['result'])
 
@@ -43,13 +51,13 @@ class TestSampleCLICommands(unittest.TestCase):
             self.assertEqual(0.9,  result['params']['result_divide'])
 
     def test_calc_sample_with_input_params(self):
-        output = subprocess.run(["python", QUBER_CLI, "calc", "-s params.param_1=9", "-s params.param_2=10",
+        output = subprocess.run(["python", QUBER_CLI, "calc", "--log-level=DEBUG", "-s params.param_1=9", "-s params.param_2=10",
                                  "-p params.operation=multiply", "-p params.result_name=result_divide"],
                                 capture_output=True, text=True)
         match = re.search(r'.*paths.output.params: (.*)', output.stdout)
         if not match:
             raise Exception(f"Unexpected command execution result:\n{output.stdout + output.stderr}")
-        with open(match.group(1), 'r', encoding='utf-8') as file:
+        with open(strip_ansi_codes(match.group(1)).strip(), 'r', encoding='utf-8') as file:
             result = yaml.safe_load(file)
             self.assertEqual(90, result['params']['result_divide'])
 

@@ -134,3 +134,12 @@ def __podman_run(**kwargs):
     from qubership_cli_samples.podman.podman_command import PodmanRunImage
     command = PodmanRunImage(**kwargs)
     command.run()
+
+
+@cli.command("gitlab-run-pipeline")
+@utils_cli
+def __gitlab_run_pipeline(**kwargs):
+    from qubership_pipelines_common_library.v2.gitlab.gitlab_run_pipeline_command import GitlabRunPipeline
+    from qubership_pipelines_common_library.v2.gitlab.custom_extensions import GitlabModulesOpsPipelineDataImporter, GitlabDOBPParamsPreExt
+    command = GitlabRunPipeline(**kwargs, pipeline_data_importer=GitlabModulesOpsPipelineDataImporter(), pre_execute_actions=[GitlabDOBPParamsPreExt()])
+    command.run()
