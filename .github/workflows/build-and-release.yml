@@ -65,8 +65,6 @@ jobs:
       run: echo "release_version=$(poetry version --short)" >> "$GITHUB_OUTPUT"
 
     - name: Build & Test
-      env:
-        GITLAB_QUBER_TOKEN: ${{ secrets.GITLAB_QUBER_TOKEN }}
       run: |
         source ./.github/scripts/build_pyz.sh
         ./.github/scripts/run_tests.sh
