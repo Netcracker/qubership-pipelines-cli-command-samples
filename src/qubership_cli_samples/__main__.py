@@ -2,6 +2,9 @@ import time
 start_time = time.perf_counter()
 import os, sys, click, logging
 from qubership_pipelines_common_library.v1.utils.utils_cli import utils_cli
+from qubership_pipelines_common_library.v1.utils.utils_string import UtilsString
+
+ENABLE_PROFILER_STATS = UtilsString.convert_to_bool(os.getenv('PIPELINES_DECLARATIVE_EXECUTOR_ENABLE_PROFILER_STATS', False))
 
 
 @click.group(chain=True)
@@ -29,46 +32,64 @@ def __calc(**kwargs):
 @cli.command("spam")
 @utils_cli
 def __spam(**kwargs):
-    logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
-    start_cmd_import = time.perf_counter()
-    from qubership_cli_samples.sample_command import GenerateTestOutputParamsCommand
-    logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
-    start_cmd = time.perf_counter()
-    try:
+    if ENABLE_PROFILER_STATS:
+        logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
+        start_cmd_import = time.perf_counter()
+        from qubership_cli_samples.sample_command import GenerateTestOutputParamsCommand
+        logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
+        start_cmd = time.perf_counter()
+        try:
+            command = GenerateTestOutputParamsCommand(**kwargs)
+            command.run()
+        finally:
+            logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+    else:
+        from qubership_cli_samples.sample_command import GenerateTestOutputParamsCommand
         command = GenerateTestOutputParamsCommand(**kwargs)
         command.run()
-    finally:
-        logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+        return
 
 
 @cli.command("spam-files")
 @utils_cli
 def __spam_files(**kwargs):
-    logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
-    start_cmd_import = time.perf_counter()
-    from qubership_cli_samples.sample_command import GenerateTestOutputFilesCommand
-    logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
-    start_cmd = time.perf_counter()
-    try:
+    if ENABLE_PROFILER_STATS:
+        logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
+        start_cmd_import = time.perf_counter()
+        from qubership_cli_samples.sample_command import GenerateTestOutputFilesCommand
+        logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
+        start_cmd = time.perf_counter()
+        try:
+            command = GenerateTestOutputFilesCommand(**kwargs)
+            command.run()
+        finally:
+            logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+    else:
+        from qubership_cli_samples.sample_command import GenerateTestOutputFilesCommand
         command = GenerateTestOutputFilesCommand(**kwargs)
         command.run()
-    finally:
-        logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+        return
 
 
 @cli.command("spam-module-report")
 @utils_cli
 def __spam_module_report(**kwargs):
-    logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
-    start_cmd_import = time.perf_counter()
-    from qubership_cli_samples.sample_command import GenerateTestModuleReportCommand
-    logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
-    start_cmd = time.perf_counter()
-    try:
+    if ENABLE_PROFILER_STATS:
+        logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
+        start_cmd_import = time.perf_counter()
+        from qubership_cli_samples.sample_command import GenerateTestModuleReportCommand
+        logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
+        start_cmd = time.perf_counter()
+        try:
+            command = GenerateTestModuleReportCommand(**kwargs)
+            command.run()
+        finally:
+            logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+    else:
+        from qubership_cli_samples.sample_command import GenerateTestModuleReportCommand
         command = GenerateTestModuleReportCommand(**kwargs)
         command.run()
-    finally:
-        logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+        return
 
 
 @cli.command("list-minio-files")

@@ -12,7 +12,7 @@ class BuildReport(ExecutionCommand):
         return True
 
     def _execute(self):
-        report_data_path = Path(self.context.input_param_get("paths.input.files")).joinpath("execution_report.json")
+        report_data_path = Path(self.context.input_param_get("paths.input.files")).joinpath("pipeline_report.json")
         with open(report_data_path, 'r') as rd:
             report_data = json.load(rd)
 

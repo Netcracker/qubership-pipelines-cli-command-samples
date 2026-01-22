@@ -1,4 +1,5 @@
 from qubership_pipelines_common_library.v1.execution.exec_command import ExecutionCommand
+from qubership_pipelines_common_library.v1.utils.utils_string import UtilsString
 
 WORD_LIST = [
     "apple", "happy", "sunshine", "book", "mountain",
@@ -63,21 +64,55 @@ class CalcCommand(ExecutionCommand):
 class GenerateTestOutputParamsCommand(ExecutionCommand):
 
     def _validate(self):
-        names = ["paths.input.params",
-                 "paths.output.params"]
-        return self.context.validate(names)
+        names = [
+            "paths.input.params",
+            "paths.output.params"
+        ]
+        if not self.context.validate(names):
+            return False
+        self.param_count = int(self.context.input_param_get("params.param_count", 5))
+        self.sleep_time = float(self.context.input_param_get("params.sleep_time", 0))
+        self.sleep_period = float(self.context.input_param_get("params.sleep_period", 1))
+        self.random_sleep = UtilsString.convert_to_bool(self.context.input_param_get("params.random_sleep", False))
+        self.print_all_level_logs = UtilsString.convert_to_bool(self.context.input_param_get("params.print_all_level_logs", False))
+        return True
 
     def _execute(self):
-        import random
+        import random, time
         self.context.logger.info("Running GenerateTestOutputParamsCommand - generating params into output_params and output_params_secure...")
+        self.context.logger.warning("This command should only be used for debugging pipelines!")
 
-        for i in range(5):
-            self.context.output_param_set(f"params.some_insecure_param_{i}",
-                                          f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
-            self.context.output_param_secure_set(f"params.secure_param_{i}",
-                                          f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
-        self.context.output_param_set("params.nested_system.its_key", f"{random.choice(WORD_LIST)}")
-        self.context.output_param_set("params.nested_system.its_secret", f"{random.choice(WORD_LIST)}")
+        if self.param_count > 0:
+            for i in range(self.param_count):
+                self.context.output_param_set(f"params.some_insecure_param_{i}",
+                                              f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
+                self.context.output_param_secure_set(f"params.secure_param_{i}",
+                                              f"{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}_{random.choice(WORD_LIST)}")
+            self.context.output_param_set("params.nested_system.its_key", f"{random.choice(WORD_LIST)}")
+            self.context.output_param_set("params.nested_system.its_secret", f"{random.choice(WORD_LIST)}")
+        else:
+            self.context.logger.info(f"Not generating any params (param_count={self.param_count})")
+
+        if self.sleep_time > 0:
+            if self.random_sleep:
+                actual_sleep_time = random.uniform(0.1, self.sleep_time)
+            else:
+                actual_sleep_time = self.sleep_time
+            self.context.logger.info(f"Will sleep for {actual_sleep_time:.2f} seconds")
+            total_time = 0
+            while total_time < actual_sleep_time:
+                self.context.logger.debug(f"Sleeping for {self.sleep_period:.2f} second(s). Total: {total_time:.2f}/{actual_sleep_time:.2f}")
+                time.sleep(self.sleep_period)
+                total_time += self.sleep_period
+            self.context.logger.info(f"Finished sleeping for {total_time:.2f} seconds")
+
+        if self.print_all_level_logs:
+            self.context.logger.debug("Sample DEBUG log")
+            self.context.logger.info("Sample INFO log")
+            self.context.logger.warning("Sample WARNING log")
+            self.context.logger.error("Sample ERROR log")
+            self.context.logger.critical("Sample CRITICAL log")
+
         self.context.output_params_save()
         self.context.logger.info("Finished GenerateTestOutputParamsCommand")
 
@@ -104,6 +139,8 @@ class GenerateTestOutputFilesCommand(ExecutionCommand):
 
 class GenerateTestModuleReportCommand(ExecutionCommand):
 
+    MODULE_REPORT_NAME = "module_report"
+
     def _validate(self):
         names = ["paths.input.params",
                  "paths.output.params"]
@@ -114,7 +151,8 @@ class GenerateTestModuleReportCommand(ExecutionCommand):
         from pathlib import Path
         params_count = int(self.context.input_param_get("params.params_count", 3))
         report_extension = self.context.input_param_get("params.extension", "json")
-        self.context.logger.info(f"Running GenerateTestModuleReportCommand - generating params into moduleReport file... (params_count={params_count}, extension={report_extension})")
+        self.context.logger.info(f"Running GenerateTestModuleReportCommand - generating params into moduleReport file..."
+                                 f" (params_count={params_count}, name={self.MODULE_REPORT_NAME}, extension={report_extension})")
 
         report = {
             "kind": "AtlasModuleReport",
@@ -131,10 +169,10 @@ class GenerateTestModuleReportCommand(ExecutionCommand):
 
         if report_extension_lower == "json":
             import json
-            with open(Path(self.context.path_logs).joinpath("execution_report.json"), 'w') as fs:
+            with open(Path(self.context.path_logs).joinpath(f"{self.MODULE_REPORT_NAME}.json"), 'w') as fs:
                 fs.write(json.dumps(report))
         elif report_extension_lower == "yaml":
             from qubership_pipelines_common_library.v1.utils.utils_file import UtilsFile
-            UtilsFile.write_yaml(Path(self.context.path_logs).joinpath("execution_report.yaml"), report)
+            UtilsFile.write_yaml(Path(self.context.path_logs).joinpath(f"{self.MODULE_REPORT_NAME}.yaml"), report)
 
         self.context.logger.info("Finished GenerateTestModuleReportCommand")
