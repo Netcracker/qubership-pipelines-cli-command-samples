@@ -92,6 +92,27 @@ def __spam_module_report(**kwargs):
         return
 
 
+@cli.command("system-load-test")
+@utils_cli
+def __spam_module_report(**kwargs):
+    if ENABLE_PROFILER_STATS:
+        logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
+        start_cmd_import = time.perf_counter()
+        from qubership_cli_samples.debug.system_load_commands import SystemLoadTestCommand
+        logging.info(f"Cmd import: {(time.perf_counter() - start_cmd_import) * 1_000} ms")
+        start_cmd = time.perf_counter()
+        try:
+            command = SystemLoadTestCommand(**kwargs)
+            command.run()
+        finally:
+            logging.info(f"Cmd run time: {(time.perf_counter() - start_cmd) * 1_000} ms")
+    else:
+        from qubership_cli_samples.debug.system_load_commands import SystemLoadTestCommand
+        command = SystemLoadTestCommand(**kwargs)
+        command.run()
+        return
+
+
 @cli.command("list-minio-files")
 @utils_cli
 def __list_minio_files(**kwargs):
@@ -133,14 +154,6 @@ def __generate_context_from_env(context_folder, **kwargs):
     command.run()
 
 
-@cli.command("github-run-pipeline")
-@utils_cli
-def __trigger_github_pipeline(**kwargs):
-    from qubership_cli_samples.github.github_command import GithubRunPipeline
-    command = GithubRunPipeline(**kwargs)
-    command.run()
-
-
 @cli.command("generate-html-report")
 @utils_cli
 def __generate_html_report(**kwargs):
@@ -149,11 +162,11 @@ def __generate_html_report(**kwargs):
     command.run()
 
 
-@cli.command("podman-run")
+@cli.command("github-run-pipeline")
 @utils_cli
-def __podman_run(**kwargs):
-    from qubership_cli_samples.podman.podman_command import PodmanRunImage
-    command = PodmanRunImage(**kwargs)
+def __github_run_pipeline(**kwargs):
+    from qubership_pipelines_common_library.v2.github.github_run_pipeline_command import GithubRunPipeline
+    command = GithubRunPipeline(**kwargs)
     command.run()
 
 
@@ -163,4 +176,20 @@ def __gitlab_run_pipeline(**kwargs):
     from qubership_pipelines_common_library.v2.gitlab.gitlab_run_pipeline_command import GitlabRunPipeline
     from qubership_pipelines_common_library.v2.gitlab.custom_extensions import GitlabModulesOpsPipelineDataImporter, GitlabDOBPParamsPreExt
     command = GitlabRunPipeline(**kwargs, pipeline_data_importer=GitlabModulesOpsPipelineDataImporter(), pre_execute_actions=[GitlabDOBPParamsPreExt()])
+    command.run()
+
+
+@cli.command("jenkins-run-pipeline")
+@utils_cli
+def __jenkins_run_pipeline(**kwargs):
+    from pack.qubership_pipelines_common_library.v2.jenkins.jenkins_run_pipeline_command import JenkinsRunPipeline
+    command = JenkinsRunPipeline(**kwargs)
+    command.run()
+
+
+@cli.command("podman-run-image")
+@utils_cli
+def __podman_run_image(**kwargs):
+    from qubership_pipelines_common_library.v2.podman.podman_command import PodmanRunImage
+    command = PodmanRunImage(**kwargs)
     command.run()
