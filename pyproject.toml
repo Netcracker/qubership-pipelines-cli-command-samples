@@ -9,6 +9,7 @@ packages = [{from = "src", include = "qubership_cli_samples"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+urllib3 = "^2.6.3"
 qubership-pipelines-common-library = "*"
 
 [tool.poetry.group.test.dependencies]
