@@ -1,4 +1,4 @@
-USED_SERVICES=("codeartifact")
+USED_SERVICES=("codeartifact" "secretsmanager" "ecr" "sts")
 
 mkdir -p ./tmp/data/
 for folder in "${USED_SERVICES[@]}"; do

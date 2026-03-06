@@ -193,3 +193,11 @@ def __podman_run_image(**kwargs):
     from qubership_pipelines_common_library.v2.podman.podman_command import PodmanRunImage
     command = PodmanRunImage(**kwargs)
     command.run()
+
+
+@cli.command("prepare-pyz-module")
+@utils_cli
+def __podman_run_image(**kwargs):
+    from qubership_pipelines_common_library.v2.pipelines.prepare_pyz_module_command import PreparePyzModule
+    command = PreparePyzModule(**kwargs)
+    command.run()

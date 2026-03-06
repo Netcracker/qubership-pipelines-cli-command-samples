@@ -18,6 +18,10 @@ on:
         default: 0.0.1
         type: string
         required: true
+      common-lib-branch:
+        description: 'Branch of common-lib to use (leave empty for latest PyPI release)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -64,10 +68,22 @@ jobs:
       id: save-release-version
       run: echo "release_version=$(poetry version --short)" >> "$GITHUB_OUTPUT"
 
+    - name: Override common-lib dependency with git if branch provided
+      if: ${{ inputs.common-lib-branch != '' }}
+      run: |
+        BRANCH="${{ github.event.inputs.common-lib-branch }}"
+        sed -i "s|qubership-pipelines-common-library = \"\*\"|qubership-pipelines-common-library = { git = \"https://github.com/Netcracker/qubership-pipelines-common-python-library.git\", branch = \"$BRANCH\" }|" pyproject.toml
+        echo "Updated pyproject.toml to use common-lib from branch: $BRANCH"
+
     - name: Build & Test
       run: |
         source ./.github/scripts/build_pyz.sh
         ./.github/scripts/run_tests.sh
+
+    - name: Revert common-lib dependency update before committing
+      if: ${{ inputs.common-lib-branch != '' }}
+      run: |
+        sed -i '/^qubership-pipelines-common-library =/c\qubership-pipelines-common-library = "*"' pyproject.toml
 
     - name: Commit changes
       if: ${{ inputs.patch_version }}
@@ -113,21 +129,22 @@ jobs:
         tag_name: v${{ needs.build-and-test.outputs.release_version }}
         files: qubership_cli_samples.pyz
 
-  build-docker-image:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    needs: [ build-and-test, upload-release-assets ]
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Build and Publish Docker Image
-      uses: Netcracker/qubership-workflow-hub/actions/docker-action@b2468074afe9e14270e4d3967376cded733da360 #v2.0.5
-      with:
-        ref: ${{ github.ref_name }}
-        custom-image-name: qubership-pipelines-cli-command-samples
-        platforms: linux/amd64
-        tags: latest, v${{ needs.build-and-test.outputs.release_version }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#  CLI Samples is currently used inside PDE image already
+#  build-docker-image:
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#    needs: [ build-and-test, upload-release-assets ]
+#    steps:
+#    - uses: actions/checkout@v4
+#
+#    - name: Build and Publish Docker Image
+#      uses: Netcracker/qubership-workflow-hub/actions/docker-action@b2468074afe9e14270e4d3967376cded733da360 #v2.0.5
+#      with:
+#        ref: ${{ github.ref_name }}
+#        custom-image-name: qubership-pipelines-cli-command-samples
+#        platforms: linux/amd64
+#        tags: latest, v${{ needs.build-and-test.outputs.release_version }}
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
