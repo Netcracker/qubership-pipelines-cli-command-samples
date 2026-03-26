@@ -1,0 +1,104 @@
+name: Build and Release Alpine Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      patch_version:
+        description: "Patch version"
+        default: false
+        required: true
+        type: boolean
+      use_custom_version:
+        description: "Use custom_version instead of increment"
+        default: false
+        required: true
+        type: boolean
+      custom_version:
+        description: "Specific version to release:"
+        default: 0.0.1
+        type: string
+        required: true
+      common-lib-branch:
+        description: 'Branch of common-lib to use (leave empty for latest PyPI release)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.13-alpine
+    outputs:
+      release_version: ${{ steps.save-release-version.outputs.release_version }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install system dependencies
+      run: |
+        apk add --no-cache python3 py3-pip py3-virtualenv gcc musl-dev libffi-dev openssl-dev git
+
+    - name: Set up Python and pip
+      run: |
+        python3 -m pip install --upgrade pip setuptools wheel
+        python3 -m pip install poetry
+
+    - name: Save release version
+      id: save-release-version
+      run: echo "release_version=$(poetry version --short)" >> "$GITHUB_OUTPUT"
+
+    - name: Override common-lib dependency with git if branch provided
+      if: ${{ inputs.common-lib-branch != '' }}
+      run: |
+        BRANCH="${{ github.event.inputs.common-lib-branch }}"
+        sed -i "s|qubership-pipelines-common-library = \"\*\"|qubership-pipelines-common-library = { git = \"https://github.com/Netcracker/qubership-pipelines-common-python-library.git\", branch = \"$BRANCH\" }|" pyproject.toml
+        echo "Updated pyproject.toml to use common-lib from branch: $BRANCH"
+
+    - name: Build & Test
+      run: |
+        source ./.github/scripts/build_pyz.sh
+        ./.github/scripts/run_tests.sh
+        mv qubership_cli_samples.pyz qubership_cli_samples_alpine.pyz
+
+    - name: Revert common-lib dependency update before committing
+      if: ${{ inputs.common-lib-branch != '' }}
+      run: |
+        sed -i '/^qubership-pipelines-common-library =/c\qubership-pipelines-common-library = "*"' pyproject.toml
+
+    - name: Save built CLI
+      uses: actions/upload-artifact@v4
+      with:
+        name: qubership_cli_samples_alpine
+        path: qubership_cli_samples_alpine.pyz
+
+  create-github-release:
+    permissions:
+      contents: write
+      pull-requests: write
+    needs: [ build-and-test ]
+    uses: Netcracker/qubership-workflow-hub/.github/workflows/release-drafter.yml@v1.0.1
+    with:
+      version: ${{ needs.build-and-test.outputs.release_version }}
+      ref: ${{ github.ref_name }}
+      publish: true
+
+  upload-release-assets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    needs: [ create-github-release, build-and-test ]
+    steps:
+    - name: Download built PYZ from current build
+      uses: actions/download-artifact@v4
+      with:
+        name: qubership_cli_samples_alpine
+
+    - name: Upload asset to last release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ needs.build-and-test.outputs.release_version }}
+        files: qubership_cli_samples_alpine.pyz

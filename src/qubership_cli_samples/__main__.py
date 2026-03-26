@@ -94,7 +94,7 @@ def __spam_module_report(**kwargs):
 
 @cli.command("system-load-test")
 @utils_cli
-def __spam_module_report(**kwargs):
+def __system_load_test(**kwargs):
     if ENABLE_PROFILER_STATS:
         logging.info(f"Common imports: {(time.perf_counter() - start_time) * 1_000} ms")
         start_cmd_import = time.perf_counter()
@@ -182,7 +182,7 @@ def __gitlab_run_pipeline(**kwargs):
 @cli.command("jenkins-run-pipeline")
 @utils_cli
 def __jenkins_run_pipeline(**kwargs):
-    from pack.qubership_pipelines_common_library.v2.jenkins.jenkins_run_pipeline_command import JenkinsRunPipeline
+    from qubership_pipelines_common_library.v2.jenkins.jenkins_run_pipeline_command import JenkinsRunPipeline
     command = JenkinsRunPipeline(**kwargs)
     command.run()
 
@@ -200,4 +200,12 @@ def __podman_run_image(**kwargs):
 def __podman_run_image(**kwargs):
     from qubership_pipelines_common_library.v2.pipelines.prepare_pyz_module_command import PreparePyzModule
     command = PreparePyzModule(**kwargs)
+    command.run()
+
+
+@cli.command("validate-dependencies")
+@utils_cli
+def __validate_dependencies(**kwargs):
+    from qubership_cli_samples.debug.validate_dependencies_command import ValidateDependenciesCommand
+    command = ValidateDependenciesCommand(**kwargs)
     command.run()

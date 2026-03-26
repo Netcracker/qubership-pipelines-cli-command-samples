@@ -1,7 +1,7 @@
-USED_SERVICES=("codeartifact" "secretsmanager" "ecr" "sts")
+USED_SERVICES="codeartifact" "secretsmanager" "ecr" "sts"
 
 mkdir -p ./tmp/data/
-for folder in "${USED_SERVICES[@]}"; do
+for folder in $USED_SERVICES; do
     if [ -d "./pack/botocore/data/$folder" ]; then
         cp -r "./pack/botocore/data/$folder" "./tmp/data/"
     fi
