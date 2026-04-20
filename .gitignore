@@ -9,3 +9,5 @@ venv
 __pycache__/
 poetry.lock
 *.pyz
+x_devtest_dir
+x_local_debug
