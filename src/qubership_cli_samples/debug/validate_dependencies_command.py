@@ -30,6 +30,7 @@ class ValidateDependenciesCommand(ExecutionCommand):
         from qubership_cli_samples.file_processing.file_commands import GenerateContextFromEnv
         from qubership_cli_samples.report.report_command import BuildReport
         from qubership_cli_samples.minio_commands import ListMinioBucketObjectsCommand
+        from qubership_cli_samples.debug.debug_command import DebugCommand
         from qubership_cli_samples.debug.system_load_commands import SystemLoadTestCommand
         from qubership_cli_samples.sample_command import GenerateTestModuleReportCommand
         from qubership_cli_samples.sample_command import GenerateTestOutputFilesCommand
@@ -42,7 +43,7 @@ class ValidateDependenciesCommand(ExecutionCommand):
         from qubership_pipelines_common_library.v2.gitlab.custom_extensions import GitlabModulesOpsPipelineDataImporter, GitlabDOBPParamsPreExt
         from qubership_pipelines_common_library.v2.jenkins.jenkins_run_pipeline_command import JenkinsRunPipeline
         from qubership_pipelines_common_library.v2.podman.podman_command import PodmanRunImage
-        from qubership_pipelines_common_library.v2.pipelines.prepare_pyz_module_command import PreparePyzModule
+        from qubership_pipelines_common_library.v2.pipelines.download_artifact_command import DownloadArtifact
         from qubership_pipelines_common_library.v2.notifications.send_webex_message_command import SendWebexMessage
         self.context.logger.info(f"ExecutionCommands import time: {(time.perf_counter() - start_cmd) * 1_000} ms")
 

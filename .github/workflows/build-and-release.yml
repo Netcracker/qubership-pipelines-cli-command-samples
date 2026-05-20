@@ -34,19 +34,19 @@ jobs:
     steps:
     - name: Prepare app token
       if: ${{ vars.GH_BUMP_VERSION_APP_ID != '' }}
-      uses: actions/create-github-app-token@v1
+      uses: actions/create-github-app-token@v3
       id: app-token
       with:
-        app-id: ${{ vars.GH_BUMP_VERSION_APP_ID }}
+        client-id: ${{ vars.GH_BUMP_VERSION_APP_ID }}
         private-key: ${{ secrets.GH_BUMP_VERSION_APP_KEY }}
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.11'
 
@@ -95,7 +95,7 @@ jobs:
         git push -u origin ${{ github.ref }}
 
     - name: Save built CLI
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: qubership_cli_samples
         path: qubership_cli_samples.pyz
@@ -105,7 +105,7 @@ jobs:
       contents: write
       pull-requests: write
     needs: [ build-and-test ]
-    uses: Netcracker/qubership-workflow-hub/.github/workflows/release-drafter.yml@v1.0.1
+    uses: Netcracker/qubership-workflow-hub/.github/workflows/release-drafter.yml@v2.2.2
     with:
       version: ${{ needs.build-and-test.outputs.release_version }}
       ref: ${{ github.ref_name }}
@@ -119,12 +119,12 @@ jobs:
     needs: [ create-github-release, build-and-test ]
     steps:
     - name: Download built PYZ from current build
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: qubership_cli_samples
 
     - name: Upload asset to last release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: v${{ needs.build-and-test.outputs.release_version }}
         files: qubership_cli_samples.pyz
@@ -137,7 +137,7 @@ jobs:
 #      packages: write
 #    needs: [ build-and-test, upload-release-assets ]
 #    steps:
-#    - uses: actions/checkout@v4
+#    - uses: actions/checkout@v6
 #
 #    - name: Build and Publish Docker Image
 #      uses: Netcracker/qubership-workflow-hub/actions/docker-action@b2468074afe9e14270e4d3967376cded733da360 #v2.0.5

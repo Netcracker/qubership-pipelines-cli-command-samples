@@ -8,3 +8,4 @@ unzip -q ./qubership_cli_samples.pyz -d ./debug_cli
 
 python debug_cli spam -p params__just_param=qwe
 python debug_cli spam-files -p params__just_param=qwe
+python debug_cli validate-dependencies -p params__just_param=qwe
