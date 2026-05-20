@@ -66,7 +66,7 @@ if __name__ == '__main__':
     pytest_report_collector = ResultsCollector()
     try:
         os.chdir("./tests")
-        res = pytest.main(args=["./cli"], plugins=[pytest_report_collector])
+        res = pytest.main(args=["./cli", "-s"], plugins=[pytest_report_collector])
         if res != 0:
             raise Exception("Tests failed!")
         report_execution_result(True, test_report=pytest_report_collector.get_short_summary())

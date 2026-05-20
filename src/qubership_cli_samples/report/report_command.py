@@ -64,7 +64,7 @@ class BuildReport(ExecutionCommand):
         html_report = template_str.format(
             apiVersion=report_data.get("apiVersion", "N/A"),
             user=execution.get("user", "Unknown User"),
-            email=execution.get("email", "unknown@example.com"),
+            email=execution.get("email", "example@example.com"),
             startedAt=execution.get("startedAt", "N/A"),
             time=execution.get("time", "N/A"),
             status=execution.get("status", "N/A"),

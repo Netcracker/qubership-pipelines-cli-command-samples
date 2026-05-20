@@ -195,11 +195,11 @@ def __podman_run_image(**kwargs):
     command.run()
 
 
-@cli.command("prepare-pyz-module")
+@cli.command("download-artifact")
 @utils_cli
-def __podman_run_image(**kwargs):
-    from qubership_pipelines_common_library.v2.pipelines.prepare_pyz_module_command import PreparePyzModule
-    command = PreparePyzModule(**kwargs)
+def __download_artifact(**kwargs):
+    from qubership_pipelines_common_library.v2.pipelines.download_artifact_command import DownloadArtifact
+    command = DownloadArtifact(**kwargs)
     command.run()
 
 
@@ -208,4 +208,12 @@ def __podman_run_image(**kwargs):
 def __validate_dependencies(**kwargs):
     from qubership_cli_samples.debug.validate_dependencies_command import ValidateDependenciesCommand
     command = ValidateDependenciesCommand(**kwargs)
+    command.run()
+
+
+@cli.command("debug")
+@utils_cli
+def __debug(**kwargs):
+    from qubership_cli_samples.debug.debug_command import DebugCommand
+    command = DebugCommand(**kwargs)
     command.run()

@@ -35,7 +35,7 @@ jobs:
       release_version: ${{ steps.save-release-version.outputs.release_version }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install system dependencies
       run: |
@@ -69,7 +69,7 @@ jobs:
         sed -i '/^qubership-pipelines-common-library =/c\qubership-pipelines-common-library = "*"' pyproject.toml
 
     - name: Save built CLI
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: qubership_cli_samples_alpine
         path: qubership_cli_samples_alpine.pyz
@@ -79,7 +79,7 @@ jobs:
       contents: write
       pull-requests: write
     needs: [ build-and-test ]
-    uses: Netcracker/qubership-workflow-hub/.github/workflows/release-drafter.yml@v1.0.1
+    uses: Netcracker/qubership-workflow-hub/.github/workflows/release-drafter.yml@v2.2.2
     with:
       version: ${{ needs.build-and-test.outputs.release_version }}
       ref: ${{ github.ref_name }}
@@ -93,12 +93,12 @@ jobs:
     needs: [ create-github-release, build-and-test ]
     steps:
     - name: Download built PYZ from current build
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: qubership_cli_samples_alpine
 
     - name: Upload asset to last release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: v${{ needs.build-and-test.outputs.release_version }}
         files: qubership_cli_samples_alpine.pyz
