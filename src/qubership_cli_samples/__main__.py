@@ -217,3 +217,27 @@ def __debug(**kwargs):
     from qubership_cli_samples.debug.debug_command import DebugCommand
     command = DebugCommand(**kwargs)
     command.run()
+
+
+@cli.command("semver-bump")
+@utils_cli
+def __semver_bump(**kwargs):
+    from qubership_cli_samples.utility.semver_bump_command import SemverBumpCommand
+    command = SemverBumpCommand(**kwargs)
+    command.run()
+
+
+@cli.command("json-extract")
+@utils_cli
+def __json_extract(**kwargs):
+    from qubership_cli_samples.utility.json_extract_command import JsonExtractCommand
+    command = JsonExtractCommand(**kwargs)
+    command.run()
+
+
+@cli.command("git-clone")
+@utils_cli
+def __git_clone(**kwargs):
+    from qubership_cli_samples.utility.git_clone_command import GitCloneCommand
+    command = GitCloneCommand(**kwargs)
+    command.run()

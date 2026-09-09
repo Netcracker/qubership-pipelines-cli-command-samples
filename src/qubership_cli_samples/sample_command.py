@@ -80,7 +80,7 @@ class GenerateTestOutputParamsCommand(ExecutionCommand):
     def _execute(self):
         import random, time
         self.context.logger.info("Running GenerateTestOutputParamsCommand - generating params into output_params and output_params_secure...")
-        self.context.logger.warning("This command should only be used for debugging pipelines!")
+        self.context.logger.info("This command should only be used for debugging pipelines!")
 
         if self.param_count > 0:
             for i in range(self.param_count):
