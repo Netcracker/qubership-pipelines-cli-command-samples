@@ -30,7 +30,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     container:
-      image: python:3.13-alpine
+      image: python:3.12-alpine3.23
     outputs:
       release_version: ${{ steps.save-release-version.outputs.release_version }}
     steps:
@@ -61,7 +61,7 @@ jobs:
       run: |
         source ./.github/scripts/build_pyz.sh
         ./.github/scripts/run_tests.sh
-        mv qubership_cli_samples.pyz qubership_cli_samples_alpine.pyz
+        mv qubership_cli_samples.pyz qubership_cli_samples_alpine312.pyz
 
     - name: Revert common-lib dependency update before committing
       if: ${{ inputs.common-lib-branch != '' }}
@@ -71,8 +71,8 @@ jobs:
     - name: Save built CLI
       uses: actions/upload-artifact@v7
       with:
-        name: qubership_cli_samples_alpine
-        path: qubership_cli_samples_alpine.pyz
+        name: qubership_cli_samples_alpine312
+        path: qubership_cli_samples_alpine312.pyz
 
   create-github-release:
     permissions:
@@ -95,10 +95,10 @@ jobs:
     - name: Download built PYZ from current build
       uses: actions/download-artifact@v7
       with:
-        name: qubership_cli_samples_alpine
+        name: qubership_cli_samples_alpine312
 
     - name: Upload asset to last release
       uses: softprops/action-gh-release@v3
       with:
         tag_name: v${{ needs.build-and-test.outputs.release_version }}
-        files: qubership_cli_samples_alpine.pyz
+        files: qubership_cli_samples_alpine312.pyz

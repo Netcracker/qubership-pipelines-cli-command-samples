@@ -241,3 +241,11 @@ def __git_clone(**kwargs):
     from qubership_cli_samples.utility.git_clone_command import GitCloneCommand
     command = GitCloneCommand(**kwargs)
     command.run()
+
+
+@cli.command("envgene-run")
+@utils_cli
+def __envgene_run(**kwargs):
+    from qubership_cli_samples.envgene.envgene_command import EnvGeneRunCommand
+    command = EnvGeneRunCommand(**kwargs)
+    command.run()

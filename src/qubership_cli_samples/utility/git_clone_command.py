@@ -51,14 +51,15 @@ class GitCloneCommand(ExecutionCommand):
         self.context.logger.info(f"Finished GitCloneCommand - cloned '{self.url}' @ {resolved_branch} ({commit_sha})")
 
     def _url_with_credentials(self):
-        """Inserts basic-auth credentials into https URLs. Never log the returned value!"""
+        """Inserts basic-auth credentials into HTTP(S) URLs. Never log the returned value!"""
         if not (self.username and self.password):
             return self.url
-        if not self.url.startswith("https://"):
-            self.context.logger.warning("'systems.git.username/password' are set, but 'params.url' is not an https URL - credentials will be ignored")
-            return self.url
         credentials = f"{quote(str(self.username), safe='')}:{quote(str(self.password), safe='')}"
-        return self.url.replace("https://", f"{credentials}@", 1)
+        for scheme in ("https://", "http://"):
+            if self.url.startswith(scheme):
+                return self.url.replace(scheme, f"{scheme}{credentials}@", 1)
+        self.context.logger.warning("'systems.git.username/password' are set, but 'params.url' is not an HTTP(S) URL - credentials will be ignored")
+        return self.url
 
     def _sanitize(self, text):
         """Removes credentials from git output before logging it."""
