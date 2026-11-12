@@ -58,7 +58,7 @@ class GitCloneCommand(ExecutionCommand):
             self.context.logger.warning("'systems.git.username/password' are set, but 'params.url' is not an https URL - credentials will be ignored")
             return self.url
         credentials = f"{quote(str(self.username), safe='')}:{quote(str(self.password), safe='')}"
-        return self.url.replace("https://", f"{credentials}@", 1)
+        return self.url.replace("https://", f"https://{credentials}@", 1)
 
     def _sanitize(self, text):
         """Removes credentials from git output before logging it."""
